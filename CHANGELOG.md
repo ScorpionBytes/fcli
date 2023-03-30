@@ -1,5 +1,122 @@
 # Changelog
 
+## [2.0.0](https://github.com/fortify/fcli/compare/v1.2.2...v2.0.0) (2023-03-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* `fcli ssc appversion * --attribute`: Rename to `--attributes` for consistency; repeatable option accepting comma-separated list of attributes (resolves #269)
+* `fcli ssc appversion * --useradd`: Rename to `--add-users` for consistency; repeatable option accepting comma-separated list of users (resolves #269)
+* `fcli ssc appversion * --userdel`: Rename to `--rm-users` for consistency; repeatable option accepting comma-separated list of users (resolves #269)
+* `fcli sc-dast scan start --start-url`: Rename to `--start-urls` for consistency; repeatable option accepting comma-separated list of URLs (resolves #269)
+* `fcli ssc role create --permission-id`: Rename to `--permission-ids` for consistency; repeatable option accepting comma-separated list of permission id's (resolves #269)
+* `fcli ssc appversion * --attribute`: Rename to `--attributes` for consistency; repeatable option accepting comma-separated list of attributes (resolves #269)
+* `fcli ssc appversion * --useradd`: Rename to `--add-users` for consistency; repeatable option accepting comma-separated list of users (resolves #269)
+* `fcli ssc appversion * --userdel`: Rename to `--rm-users` for consistency; repeatable option accepting comma-separated list of users (resolves #269)
+* `fcli sc-dast scan start --start-url`: Rename to `--start-urls` for consistency; repeatable option accepting comma-separated list of URLs (resolves #269)
+* `fcli ssc role create --permission-id`: Rename to `--permission-ids` for consistency; repeatable option accepting comma-separated list of permission id's (resolves #269)
+* FoD: changes to a number of options to standardize arity (fixes #268)
+* FoD: refactor `fcli fod app` creation commands (implements #266)
+* `-q` option now takes an [SpEL](https://docs.spring.io/spring-framework/docs/6.0.x/reference/html/core.html#expressions) expression; existing fcli invocations may need to be updated to use the new query format (resolves #265, resolves #172)
+* `-o expr=...` now evaluates expressions between curly braces using [SpEL](https://docs.spring.io/spring-framework/docs/6.0.x/reference/html/core.html#expressions) instead of JSONPath. Existing expressions with simple property references are not affected by this change, but more advanced JSONPath expressions will need to be rewritten to use SpEL instead.
+* The .jar version of fcli now requires Java 17 to run (previously Java 11 was required)
+* `fcli ssc report-template generate-answerFile`: Rename command to `generate-answerfile` for consistency
+* `fcli ssc report-template generate-answerFile`: Rename `--force` to `--confirm` for consistency
+* `fcli ssc app delete`: Rename `--delete-versions` to `--confirm`
+* `fcli tool * install`: Rename `--replace-existing` to `--confirm`
+* `fcli tool * uninstall`: Rename `--confirm-uninstall` to `--confirm`
+* Lookup and query values now use case-sensitive matching, to avoid inconsistent behavior with case-sensitive server-side matching and case-insensitive client-side matching (fixes #125, fixes #185)
+* `fcli sc-dast scan retry import-results`: Rename to `fcli sc-dast scan publish` as this can also be used for initial publishing
+* `fcli sc-dast scan retry import-findings`: Rename to `fcli sc-dast scan import-findings` to reduce command tree depth
+* `fcli config ssl truststore`: Rename command tree to `fcli config truststore`
+* `fcli state var`: Restructure variable-related commands
+* `fcli ssc appversion-artifact download`: Move application version state download to separate `fcli ssc appversion-artifact download-state` command
+* `fcli ssc appversion-artifact download`: Add alias `download-by-id` to differentatie from `download-state`
+* `fcli ssc appversion-artifact download`: Change artifact id option to positional parameter
+* `fcli ssc appversion-artifact import debricked`: Rename command to `fcli ssc appversion-artifact import-debricked`
+* `fcli ssc appversion-artifact purge by-id`: Rename command to `fcli ssc appversion-artifact purge-by-id`
+* `fcli ssc appversion-artifact purge by-date`: Rename command to `fcli ssc appversion-artifact purge-older-than`
+* `fcli ssc appversion-artifact purge by-date`: Change `--older-than` option to positional parameter
+* `fcli config`: Change location of configuration files; you may need to manually clean up old configuration files and re-apply configuration settings like proxy and trust store (closes #238)
+* `fcli config var`: Move location of variable data; you may need to manually clean up old variable state files and recreate any persisted variables (closes #239)
+* `fcli * session`: Move location of session data; you may need to manually clean up old session state files and run `fcli * session login` again (closes #239)
+* Cleanup: Easiest approach to clean up old configuration and state data is to delete the fcli data directory (usually <user-home>/.fortify/fcli) before you start using this new fcli version
+* `fcli config var`: Move variable-related commands to `fcli state var` (closes #237)
+* Environment: Rename `FORTIFY_HOME` and `FCLI_HOME` environment variables to `FORTIFY_DATA_DIR` and `FCLI_DATA_DIR` (closes #248)
+* Remove support for predefined `?` variables (resolves #160)
+* Change syntax for referencing variables from `{?var:prop}` to `::var::prop` (resolves #160)
+
+### Features
+
+* `-o expr=...` now evaluates expressions between curly braces using [SpEL](https://docs.spring.io/spring-framework/docs/6.0.x/reference/html/core.html#expressions) instead of JSONPath. Existing expressions with simple property references are not affected by this change, but more advanced JSONPath expressions will need to be rewritten to use SpEL instead. ([7f4a743](https://github.com/fortify/fcli/commit/7f4a7431c3101770b23f92dc9483b842d6302b86))
+* `-o json-properties` now also outputs the type of each property for informational purposes ([7f4a743](https://github.com/fortify/fcli/commit/7f4a7431c3101770b23f92dc9483b842d6302b86))
+* `-q` option now takes an [SpEL](https://docs.spring.io/spring-framework/docs/6.0.x/reference/html/core.html#expressions) expression; existing fcli invocations may need to be updated to use the new query format (resolves [#265](https://github.com/fortify/fcli/issues/265), resolves [#172](https://github.com/fortify/fcli/issues/172)) ([7f4a743](https://github.com/fortify/fcli/commit/7f4a7431c3101770b23f92dc9483b842d6302b86))
+* `fcli * session`: Move location of session data; you may need to manually clean up old session state files and run `fcli * session login` again (closes [#239](https://github.com/fortify/fcli/issues/239)) ([a6d8b36](https://github.com/fortify/fcli/commit/a6d8b361619c168836d09a7692ad4a7008b9de3a))
+* `fcli config clear`: Add support for interactive confirmation ([8459b8e](https://github.com/fortify/fcli/commit/8459b8ed2931ccb4bf3d9bf94060b3c7a92a09e1))
+* `fcli config clear`: Clear only configuration data, not state data ([a6d8b36](https://github.com/fortify/fcli/commit/a6d8b361619c168836d09a7692ad4a7008b9de3a))
+* `fcli config ssl truststore`: Rename command tree to `fcli config truststore` ([e8bedf1](https://github.com/fortify/fcli/commit/e8bedf16a634a57f77dd38306358c4573601fd8d))
+* `fcli config var`: Move location of variable data; you may need to manually clean up old variable state files and recreate any persisted variables (closes [#239](https://github.com/fortify/fcli/issues/239)) ([a6d8b36](https://github.com/fortify/fcli/commit/a6d8b361619c168836d09a7692ad4a7008b9de3a))
+* `fcli config var`: Move variable-related commands to `fcli state var` (closes [#237](https://github.com/fortify/fcli/issues/237)) ([a6d8b36](https://github.com/fortify/fcli/commit/a6d8b361619c168836d09a7692ad4a7008b9de3a))
+* `fcli config`: Change location of configuration files; you may need to manually clean up old configuration files and re-apply configuration settings like proxy and trust store (closes [#238](https://github.com/fortify/fcli/issues/238)) ([a6d8b36](https://github.com/fortify/fcli/commit/a6d8b361619c168836d09a7692ad4a7008b9de3a))
+* `fcli sc-dast scan retry import-findings`: Rename to `fcli sc-dast scan import-findings` to reduce command tree depth ([098a5f3](https://github.com/fortify/fcli/commit/098a5f3191270c84d5c062cfa5a57fe4154fbffa))
+* `fcli sc-dast scan retry import-results`: Rename to `fcli sc-dast scan publish` as this can also be used for initial publishing ([098a5f3](https://github.com/fortify/fcli/commit/098a5f3191270c84d5c062cfa5a57fe4154fbffa))
+* `fcli sc-dast scan start --start-url`: Rename to `--start-urls` for consistency; repeatable option accepting comma-separated list of URLs (resolves [#269](https://github.com/fortify/fcli/issues/269)) ([caa8061](https://github.com/fortify/fcli/commit/caa8061588aa2861410ca8ba1efba3f3d75f9949))
+* `fcli sc-dast scan start --start-url`: Rename to `--start-urls` for consistency; repeatable option accepting comma-separated list of URLs (resolves [#269](https://github.com/fortify/fcli/issues/269)) ([f4a0a6e](https://github.com/fortify/fcli/commit/f4a0a6ec6df9e8e41a3114fc0e3ebab6a6390f95))
+* `fcli ssc app delete`: Add support for interactive confirmation ([8459b8e](https://github.com/fortify/fcli/commit/8459b8ed2931ccb4bf3d9bf94060b3c7a92a09e1))
+* `fcli ssc app delete`: Rename `--delete-versions` to `--confirm` ([8459b8e](https://github.com/fortify/fcli/commit/8459b8ed2931ccb4bf3d9bf94060b3c7a92a09e1))
+* `fcli ssc appversion * --attribute`: Rename to `--attributes` for consistency; repeatable option accepting comma-separated list of attributes (resolves [#269](https://github.com/fortify/fcli/issues/269)) ([caa8061](https://github.com/fortify/fcli/commit/caa8061588aa2861410ca8ba1efba3f3d75f9949))
+* `fcli ssc appversion * --attribute`: Rename to `--attributes` for consistency; repeatable option accepting comma-separated list of attributes (resolves [#269](https://github.com/fortify/fcli/issues/269)) ([f4a0a6e](https://github.com/fortify/fcli/commit/f4a0a6ec6df9e8e41a3114fc0e3ebab6a6390f95))
+* `fcli ssc appversion * --useradd`: Rename to `--add-users` for consistency; repeatable option accepting comma-separated list of users (resolves [#269](https://github.com/fortify/fcli/issues/269)) ([caa8061](https://github.com/fortify/fcli/commit/caa8061588aa2861410ca8ba1efba3f3d75f9949))
+* `fcli ssc appversion * --useradd`: Rename to `--add-users` for consistency; repeatable option accepting comma-separated list of users (resolves [#269](https://github.com/fortify/fcli/issues/269)) ([f4a0a6e](https://github.com/fortify/fcli/commit/f4a0a6ec6df9e8e41a3114fc0e3ebab6a6390f95))
+* `fcli ssc appversion * --userdel`: Rename to `--rm-users` for consistency; repeatable option accepting comma-separated list of users (resolves [#269](https://github.com/fortify/fcli/issues/269)) ([caa8061](https://github.com/fortify/fcli/commit/caa8061588aa2861410ca8ba1efba3f3d75f9949))
+* `fcli ssc appversion * --userdel`: Rename to `--rm-users` for consistency; repeatable option accepting comma-separated list of users (resolves [#269](https://github.com/fortify/fcli/issues/269)) ([f4a0a6e](https://github.com/fortify/fcli/commit/f4a0a6ec6df9e8e41a3114fc0e3ebab6a6390f95))
+* `fcli ssc appversion-artifact download`: Add alias `download-by-id` to differentatie from `download-state` ([3d96cfd](https://github.com/fortify/fcli/commit/3d96cfddf976486a77e65fa26f9b883b71f89ab3))
+* `fcli ssc appversion-artifact download`: Change artifact id option to positional parameter ([3d96cfd](https://github.com/fortify/fcli/commit/3d96cfddf976486a77e65fa26f9b883b71f89ab3))
+* `fcli ssc appversion-artifact download`: Move application version state download to separate `fcli ssc appversion-artifact download-state` command ([3d96cfd](https://github.com/fortify/fcli/commit/3d96cfddf976486a77e65fa26f9b883b71f89ab3))
+* `fcli ssc appversion-artifact import debricked`: Rename command to `fcli ssc appversion-artifact import-debricked` ([3d96cfd](https://github.com/fortify/fcli/commit/3d96cfddf976486a77e65fa26f9b883b71f89ab3))
+* `fcli ssc appversion-artifact purge by-date`: Change `--older-than` option to positional parameter ([3d96cfd](https://github.com/fortify/fcli/commit/3d96cfddf976486a77e65fa26f9b883b71f89ab3))
+* `fcli ssc appversion-artifact purge by-date`: Rename command to `fcli ssc appversion-artifact purge-older-than` ([3d96cfd](https://github.com/fortify/fcli/commit/3d96cfddf976486a77e65fa26f9b883b71f89ab3))
+* `fcli ssc appversion-artifact purge by-id`: Rename command to `fcli ssc appversion-artifact purge-by-id` ([3d96cfd](https://github.com/fortify/fcli/commit/3d96cfddf976486a77e65fa26f9b883b71f89ab3))
+* `fcli ssc report-template generate-answerFile`: Add support for interactive confirmation ([ec6df34](https://github.com/fortify/fcli/commit/ec6df34f8b0157a01f15d1d10e0f237d249e71dc))
+* `fcli ssc report-template generate-answerFile`: Rename `--force` to `--confirm` for consistency ([ec6df34](https://github.com/fortify/fcli/commit/ec6df34f8b0157a01f15d1d10e0f237d249e71dc))
+* `fcli ssc report-template generate-answerFile`: Rename command to `generate-answerfile` for consistency ([ec6df34](https://github.com/fortify/fcli/commit/ec6df34f8b0157a01f15d1d10e0f237d249e71dc))
+* `fcli ssc role create --permission-id`: Rename to `--permission-ids` for consistency; repeatable option accepting comma-separated list of permission id's (resolves [#269](https://github.com/fortify/fcli/issues/269)) ([caa8061](https://github.com/fortify/fcli/commit/caa8061588aa2861410ca8ba1efba3f3d75f9949))
+* `fcli ssc role create --permission-id`: Rename to `--permission-ids` for consistency; repeatable option accepting comma-separated list of permission id's (resolves [#269](https://github.com/fortify/fcli/issues/269)) ([f4a0a6e](https://github.com/fortify/fcli/commit/f4a0a6ec6df9e8e41a3114fc0e3ebab6a6390f95))
+* `fcli state clear`: Add support for interactive confirmation ([8459b8e](https://github.com/fortify/fcli/commit/8459b8ed2931ccb4bf3d9bf94060b3c7a92a09e1))
+* `fcli state clear`: New command to clear state data ([a6d8b36](https://github.com/fortify/fcli/commit/a6d8b361619c168836d09a7692ad4a7008b9de3a))
+* `fcli state var`: Restructure variable-related commands ([934d607](https://github.com/fortify/fcli/commit/934d607384db589067cd2ede6d8cfab61482d265))
+* `fcli tool * install`: Add option to warn instead of fail on digest mismatch (resolves [#251](https://github.com/fortify/fcli/issues/251)) ([08e8e26](https://github.com/fortify/fcli/commit/08e8e2639a8ffd357dbfa2a19301a80da2e98ee8))
+* `fcli tool * install`: Add support for interactive confirmation ([8459b8e](https://github.com/fortify/fcli/commit/8459b8ed2931ccb4bf3d9bf94060b3c7a92a09e1))
+* `fcli tool * install`: Install latest version known to fcli by default, rather than 'latest' to avoid potential digest mismatches (resolves [#251](https://github.com/fortify/fcli/issues/251)) ([08e8e26](https://github.com/fortify/fcli/commit/08e8e2639a8ffd357dbfa2a19301a80da2e98ee8))
+* `fcli tool * install`: Rename `--replace-existing` to `--confirm` ([8459b8e](https://github.com/fortify/fcli/commit/8459b8ed2931ccb4bf3d9bf94060b3c7a92a09e1))
+* `fcli tool * list`: Include information on what version will be installed by default (resolves [#251](https://github.com/fortify/fcli/issues/251)) ([08e8e26](https://github.com/fortify/fcli/commit/08e8e2639a8ffd357dbfa2a19301a80da2e98ee8))
+* `fcli tool * uninstall`: Add support for interactive confirmation ([8459b8e](https://github.com/fortify/fcli/commit/8459b8ed2931ccb4bf3d9bf94060b3c7a92a09e1))
+* `fcli tool * uninstall`: Rename `--confirm-uninstall` to `--confirm` ([8459b8e](https://github.com/fortify/fcli/commit/8459b8ed2931ccb4bf3d9bf94060b3c7a92a09e1))
+* Add `fcli scm github-contributor list` command ([ceb3325](https://github.com/fortify/fcli/commit/ceb332552c5a0e8180c96075003260850dc0d220))
+* Add `fcli scm gitlab-contributor list` command ([81d0985](https://github.com/fortify/fcli/commit/81d0985e044eed2369456b13649f46c4d99b69ca))
+* Add FCLI_DEFAULT_* environment variable support for all positional parameters (closes [#136](https://github.com/fortify/fcli/issues/136)) ([67fcf85](https://github.com/fortify/fcli/commit/67fcf85867d4c054eb34f4f03cff50cebe80f7a9))
+* Add support for resolving default variable property using `::var::` syntax (resolves [#160](https://github.com/fortify/fcli/issues/160)) ([4021d35](https://github.com/fortify/fcli/commit/4021d35e77d698353d00ed03cf2d9733f6dca433))
+* Change syntax for referencing variables from `{?var:prop}` to `::var::prop` (resolves [#160](https://github.com/fortify/fcli/issues/160)) ([4021d35](https://github.com/fortify/fcli/commit/4021d35e77d698353d00ed03cf2d9733f6dca433))
+* Cleanup: Easiest approach to clean up old configuration and state data is to delete the fcli data directory (usually &lt;user-home&gt;/.fortify/fcli) before you start using this new fcli version ([a6d8b36](https://github.com/fortify/fcli/commit/a6d8b361619c168836d09a7692ad4a7008b9de3a))
+* Environment: Add support for `FCLI_CONFIG_DIR` and `FCLI_STATE_DIR` environment variables, allowing for example to have a shared config directory and private state directory ([a6d8b36](https://github.com/fortify/fcli/commit/a6d8b361619c168836d09a7692ad4a7008b9de3a))
+* Environment: Rename `FORTIFY_HOME` and `FCLI_HOME` environment variables to `FORTIFY_DATA_DIR` and `FCLI_DATA_DIR` (closes [#248](https://github.com/fortify/fcli/issues/248)) ([a6d8b36](https://github.com/fortify/fcli/commit/a6d8b361619c168836d09a7692ad4a7008b9de3a))
+* FoD: add `fcli fod scan start-mobile` (implements [#260](https://github.com/fortify/fcli/issues/260)) ([266cf37](https://github.com/fortify/fcli/commit/266cf37ec1feef5e16d76e9bad5bd9f1c2482914))
+* FoD: refactor `fcli fod app` creation commands (implements [#266](https://github.com/fortify/fcli/issues/266)) ([2b9c453](https://github.com/fortify/fcli/commit/2b9c453153d82911923291f2c5db4c5e573395d4))
+* Remove support for predefined `?` variables (resolves [#160](https://github.com/fortify/fcli/issues/160)) ([4021d35](https://github.com/fortify/fcli/commit/4021d35e77d698353d00ed03cf2d9733f6dca433))
+* The .jar version of fcli now requires Java 17 to run (previously Java 11 was required) ([8530999](https://github.com/fortify/fcli/commit/853099986ae66fa43873334abdc5557347e6c523))
+
+
+### Bug Fixes
+
+* `fcli ssc appversion-artifact download`: Include externalmetadata.xml in current state FPR download by passing arbitrary clientVersion parameter to SSC (fixes [#257](https://github.com/fortify/fcli/issues/257)) ([2694ffe](https://github.com/fortify/fcli/commit/2694ffe0224d85121ea0eaadda64464a0f6f3ff5))
+* `fcli ssc report-template generate-answerFile`: Add common options like `--help` ([ec6df34](https://github.com/fortify/fcli/commit/ec6df34f8b0157a01f15d1d10e0f237d249e71dc))
+* `fcli ssc report-template generate-answerFile`: Generate proper command output ([ec6df34](https://github.com/fortify/fcli/commit/ec6df34f8b0157a01f15d1d10e0f237d249e71dc))
+* `fcli tool`: Update and improve usage instructions (resolves [#251](https://github.com/fortify/fcli/issues/251)) ([08e8e26](https://github.com/fortify/fcli/commit/08e8e2639a8ffd357dbfa2a19301a80da2e98ee8))
+* FoD: changes to a number of options to standardize arity (fixes [#268](https://github.com/fortify/fcli/issues/268)) ([2b9c453](https://github.com/fortify/fcli/commit/2b9c453153d82911923291f2c5db4c5e573395d4))
+* FoD: refactor scan commands to be under single entity (fixes [#262](https://github.com/fortify/fcli/issues/262)) ([266cf37](https://github.com/fortify/fcli/commit/266cf37ec1feef5e16d76e9bad5bd9f1c2482914))
+* Lookup and query values now use case-sensitive matching, to avoid inconsistent behavior with case-sensitive server-side matching and case-insensitive client-side matching (fixes [#125](https://github.com/fortify/fcli/issues/125), fixes [#185](https://github.com/fortify/fcli/issues/185)) ([837791f](https://github.com/fortify/fcli/commit/837791fcece08ca03c3468ec601baab83a71ff0c))
+* Missing aliases on some commands, like `ls` on `session list` and `tool list` commands ([640020e](https://github.com/fortify/fcli/commit/640020eabdc59f64ce7b75df1b00231bce7edbe3))
+
 ## [1.2.3](https://github.com/fortify/fcli/compare/v1.2.2...v1.2.3) (2023-03-09)
 
 
