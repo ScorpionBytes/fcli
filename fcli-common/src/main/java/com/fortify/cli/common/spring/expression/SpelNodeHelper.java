@@ -9,6 +9,7 @@ import java.util.stream.StreamSupport;
 import org.springframework.expression.spel.SpelNode;
 import org.springframework.expression.spel.ast.CompoundExpression;
 import org.springframework.expression.spel.ast.Literal;
+import org.springframework.expression.spel.ast.Operator;
 import org.springframework.expression.spel.ast.PropertyOrFieldReference;
 
 import lombok.RequiredArgsConstructor;
@@ -16,12 +17,31 @@ import lombok.RequiredArgsConstructor;
 public class SpelNodeHelper {
     private SpelNodeHelper() {}
     
+    public static final String getLiteralStringFromOperator(Operator node) {
+        var literal = getLiteralFromOperator(node);
+        return literal==null ? null : literal.getLiteralValue().getValue().toString();
+    }
+    
+    public static final Literal getLiteralFromOperator(Operator node) {
+        if ( node==null ) { return null; }
+        var left = node.getLeftOperand();
+        var right = node.getRightOperand();
+        return getFirstLiteral(left, right);
+    }
+    
+    public static final String getQualifiedPropertyNameFromOperator(Operator node) {
+        if ( node==null ) { return null; }
+        var left = node.getLeftOperand();
+        var right = node.getRightOperand();
+        return getFirstQualifiedPropertyName(left, right);
+    }
+    
     public static final Literal getFirstLiteral(SpelNode... nodes) {
         return (Literal)Stream.of(nodes).filter(SpelNodeHelper::isLiteral).findFirst().orElse(null);
     }
     
     public static final boolean isLiteral(SpelNode node) {
-        return node instanceof Literal;
+        return node!=null && node instanceof Literal;
     }
     
     public static final String getFirstQualifiedPropertyName(SpelNode... nodes) {
@@ -30,6 +50,7 @@ public class SpelNodeHelper {
     }
     
     public static final String getQualifiedPropertyName(SpelNode node) {
+        if ( node==null ) { return null; }
         return node instanceof PropertyOrFieldReference 
                 ? ((PropertyOrFieldReference) node).getName() 
                 : getCompoundPropertyName(node);
@@ -53,6 +74,7 @@ public class SpelNodeHelper {
     }
 
     public static final boolean isCompoundPropertyReference(SpelNode node) {
+        if ( node==null ) { return false; }
         if ( node instanceof CompoundExpression ) {
             return childrenStream(node).allMatch(SpelNodeHelper::isPropertyReference);
         } 

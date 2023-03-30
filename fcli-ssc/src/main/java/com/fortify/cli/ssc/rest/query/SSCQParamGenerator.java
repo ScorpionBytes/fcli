@@ -11,11 +11,11 @@ import org.springframework.expression.spel.SpelNode;
 import org.springframework.expression.spel.ast.OpAnd;
 import org.springframework.expression.spel.ast.OpEQ;
 
-import com.fortify.cli.common.output.query.QueryExpression;
+import com.fortify.cli.common.rest.query.IServerSideQueryParamValueGenerator;
 import com.fortify.cli.common.spring.expression.AbstractSpelTreeVisitor;
 import com.fortify.cli.common.spring.expression.SpelNodeHelper;
 
-public final class SSCQParamGenerator {
+public final class SSCQParamGenerator implements IServerSideQueryParamValueGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(SSCQParamGenerator.class);
     private final Map<String, String> qNamesByPropertyPaths = new HashMap<>();
     private final Map<String, Function<String,String>> valueGeneratorsByPropertyPaths = new HashMap<>();
@@ -32,11 +32,8 @@ public final class SSCQParamGenerator {
         return this;
     }
     
-    public final String getQParamValue(QueryExpression queryExpression) {
-        return queryExpression==null ? null : getQParamValue(queryExpression.getExpression());
-    }
-
-    public final String getQParamValue(Expression expression) {
+    @Override
+    public final String getServerSideQueryParamValue(Expression expression) {
         return new SSCQParamSpELTreeVisitor(expression).getQParamValue();
     }
     
@@ -63,11 +60,8 @@ public final class SSCQParamGenerator {
         }
 
         private void visitEQ(OpEQ node) {
-            var left = node.getLeftOperand();
-            var right = node.getRightOperand();
-            var literal = SpelNodeHelper.getFirstLiteral(right,left);
-            var propertyName = SpelNodeHelper.getFirstQualifiedPropertyName(right,left);
-            String literalString = literal==null ? null : literal.getLiteralValue().getValue().toString();
+            var propertyName = SpelNodeHelper.getQualifiedPropertyNameFromOperator(node);
+            var literalString = SpelNodeHelper.getLiteralStringFromOperator(node);
             LOG.trace("OpEQ property: {}, literal: {}", propertyName, literalString);
             if ( propertyName!=null && literalString!=null ) {
                 addEQ(propertyName, literalString);

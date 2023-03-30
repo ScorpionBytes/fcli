@@ -1,0 +1,32 @@
+# Simple prop property
+"prop=='test'","prop:test"
+
+# Method calls should be ignored
+"prop.toLowerCase()=='test'",null
+
+# Unknown properties should be ignored
+"unknown=='test'",null
+
+# Only known properties in AND expression should end up in filter-param
+"prop=='test' && unknown=='test2'","prop:test"
+
+# OR expression on same property
+"prop=='test' || prop=='test2'", "prop:test|test2"
+
+# OR expression on different properties
+"prop=='test' || nested.nested.prop=='test2'", null
+
+# Nested property
+"nested.nested.prop=='test'", "nested.nested.prop:test"
+
+# Nested null-safe property
+"nested?.nested?.prop=='test'", "nested.nested.prop:test"
+
+
+# Rename nested property
+"nested?.reword?.prop=='test'", "rewordProp:test"
+
+# AND expression
+"nested?.reword?.prop=='test' && nested?.nested?.prop=='test2'", "rewordProp:test+nested.nested.prop:test2"
+
+

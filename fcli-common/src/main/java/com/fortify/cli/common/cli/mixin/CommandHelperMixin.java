@@ -2,6 +2,7 @@ package com.fortify.cli.common.cli.mixin;
 
 import com.fortify.cli.common.output.writer.CommandSpecMessageResolver;
 import com.fortify.cli.common.output.writer.IMessageResolver;
+import com.fortify.cli.common.util.JavaHelper;
 
 import lombok.Getter;
 import picocli.CommandLine.Command;
@@ -24,7 +25,7 @@ public final class CommandHelperMixin implements ICommandAware {
      * type.
      */
     public final <T> T getCommandAs(Class<T> asType) {
-        return getAs(getCommand(), asType);
+        return JavaHelper.getAs(getCommand(), asType);
     }
 
     /**
@@ -33,24 +34,5 @@ public final class CommandHelperMixin implements ICommandAware {
      */
     public final Object getCommand() {
         return commandSpec.userObject();
-    }
-
-    /**
-     * Utility method for getting the given object as the given type,
-     * returning null if the given object is not an instance of the
-     * given type.
-     * 
-     * TODO This is potentially a reusable method; consider moving elsewhere.
-     * @param <T>
-     * @param obj
-     * @param asType
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    public final static <T> T getAs(Object obj, Class<T> asType) {
-        if ( obj!=null && asType.isAssignableFrom(obj.getClass()) ) {
-            return (T)obj;
-        }
-        return null;
     }
 }

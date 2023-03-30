@@ -24,6 +24,7 @@ import com.fortify.cli.common.output.writer.output.standard.StandardOutputConfig
 import com.fortify.cli.common.rest.paging.INextPageUrlProducer;
 import com.fortify.cli.common.rest.paging.INextPageUrlProducerSupplier;
 import com.fortify.cli.common.rest.unirest.IHttpRequestUpdater;
+import com.fortify.cli.common.util.JavaHelper;
 
 import kong.unirest.HttpRequest;
 import picocli.CommandLine.Mixin;
@@ -263,7 +264,7 @@ public abstract class AbstractOutputHelperMixin implements IOutputHelper {
      * @return
      */
     private static final <T,R> R applyWithDefaultSupplier(Object obj, Class<T> type, Function<T,R> function, Supplier<R> defaultValueSupplier) {
-        T target = CommandHelperMixin.getAs(obj, type);
+        T target = JavaHelper.getAs(obj, type);
         R result = target==null ? null : function.apply(target);
         if ( result==null && defaultValueSupplier!=null ) {
             result = defaultValueSupplier.get();
